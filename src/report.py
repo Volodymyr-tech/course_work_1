@@ -3,7 +3,7 @@ from typing import  Optional
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from src.xlsx_reader import pandas_reader_xlsx
-
+import json
 
 def spending_by_workday(transactions: pd.DataFrame, date_: Optional[str] = None) -> pd.DataFrame:
     if date_ is None:
@@ -21,14 +21,18 @@ def spending_by_workday(transactions: pd.DataFrame, date_: Optional[str] = None)
 
     filtered_df = transactions_filtered[(transactions_filtered["Дата платежа"].dt.date >= start_date) & (transactions_filtered["Дата платежа"].dt.date <= date_)]
 
-    work_day = filtered_df[filtered_df['Дата платежа'].dt.weekday < 5]
+    work_day = filtered_df[filtered_df['Дата платежа'].dt.weekday < 5]["Сумма операции"].mean()
+    day_off = filtered_df[filtered_df['Дата платежа'].dt.weekday > 5]["Сумма операции"].mean()
 
-    return work_day
+    data_to_json = {
+        "Средняя трата в рабочий день": round(work_day, 2),
+        "Средняя трата в выходной день": round(day_off, 2)
+    }
 
+    return json.dumps(data_to_json, ensure_ascii=False)
 
 
 if __name__ == "__main__":
     data_fraime = pandas_reader_xlsx(path=r"C:\Users\Владимир\PycharmProjects\pythonProject1\data\operations.xlsx")
     result = spending_by_workday(data_fraime, '31.12.2021')
     print(result)
-    print(type(result))
