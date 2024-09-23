@@ -20,9 +20,11 @@ def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: da
     # Сумма расходов
     total_expenses = filtered_df["Сумма операции"].sum()
     income_total = income_filtered["Сумма операции"].sum()
+
     # Группировка по категориям и вычисление общей суммы по каждой категории
     grouped = filtered_df.groupby("Категория", as_index=False)["Сумма операции"].sum()
     income_grouped = income_filtered.groupby("Категория", as_index=False)["Сумма операции"].sum()
+
     # Сортировка по сумме операций по убыванию
     sorted_categories = grouped.sort_values(by="Сумма операции", ascending=False)
     income_sorted = income_grouped.sort_values(by="Сумма операции", ascending=False)
@@ -46,6 +48,7 @@ def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: da
     transfers_and_cash = df[df["Категория"].isin(["Наличные", "Переводы"])]
     transfers_and_cash_grouped = transfers_and_cash.groupby("Категория", as_index=False)["Сумма операции"].sum()
 
+    # Апи запрос для получения стоимости иностранных валют
     payload = {"symbols": "USD,EUR,GBP", "base": "RUB"}
     headers = {"apikey": api_key}
 
@@ -54,12 +57,12 @@ def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: da
     response = requests.request("GET", url, headers=headers, params=payload, timeout=60)
 
     status_code = response.status_code
-    # print(status_code)
+
     if status_code == 200:
         exchange_rate = response.json()
-        # print(exchange_rate)
 
-    # Формируем финальный результат
+
+    # Финальный результат
     result = {
         "expenses": {
             "total_amount": float(total_expenses),
