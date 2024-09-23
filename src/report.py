@@ -14,15 +14,16 @@ def spending_by_workday(transactions: pd.DataFrame, date_: Optional[str] = None)
         date_ = datetime.datetime.strptime(date_,'%d.%m.%Y').date()
         start_date = date_ - relativedelta(months=3) # Отнимаем 3 месяца от текущей даты.
 
-    transactions["Дата платежа"] = pd.to_datetime(transactions["Дата платежа"]) # Преобразуем столбец с датами в datetime
+    transactions_filtered = transactions[transactions["Дата платежа"].notnull()]  # Убираем пустые строки без даты
 
-    transactions = transactions[transactions["Дата платежа"].notnull()] # Убираем пустые строки без даты
-
-    filtered_df = transactions[(transactions["Дата платежа"].dt.date >= start_date) & (transactions["Дата платежа"].dt.date <= date_)]
+    transactions_filtered["Дата платежа"] = pd.to_datetime(transactions_filtered["Дата платежа"], dayfirst=True) # Преобразуем столбец с датами в datetime
 
 
+    filtered_df = transactions_filtered[(transactions_filtered["Дата платежа"].dt.date >= start_date) & (transactions_filtered["Дата платежа"].dt.date <= date_)]
 
-    return filtered_df
+    work_day = filtered_df[filtered_df['Дата платежа'].dt.weekday < 5]
+
+    return work_day
 
 
 
