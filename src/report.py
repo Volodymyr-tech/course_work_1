@@ -14,7 +14,7 @@ def spending_by_workday(transactions: pd.DataFrame, date_: Optional[str] = None)
         date_ = datetime.datetime.strptime(date_,'%d.%m.%Y').date()
         start_date = date_ - relativedelta(months=3) # Отнимаем 3 месяца от текущей даты.
 
-    transactions_filtered = transactions[transactions["Дата платежа"].notnull()]  # Убираем пустые строки без даты
+    transactions_filtered = transactions[transactions["Дата платежа"].notnull()].copy()  # Убираем пустые строки без даты
 
     transactions_filtered["Дата платежа"] = pd.to_datetime(transactions_filtered["Дата платежа"], dayfirst=True) # Преобразуем столбец с датами в datetime
 
