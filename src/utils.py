@@ -1,6 +1,21 @@
-import json
+from config import UTILS_LOGS
 import os
 import datetime
+import logging
+from dotenv import load_dotenv
+import requests
+from typing import Any, Dict, List, Tuple
+
+logger = logging.getLogger(__file__)
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler(UTILS_LOGS, mode="w", encoding="utf-8")
+file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
+
+
+load_dotenv()
+
 
 def start_of_week(date: datetime.date) -> datetime.date:
     # Функция для получения начала недели
@@ -37,13 +52,28 @@ def get_date_range(date_str: str, range_type: str = "M") -> (datetime.date, date
 
     return start_date, date
 
-def reader_json(path: str) -> dict:
-    full_path = os.path.abspath(path)
-    with open(full_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
-    return data
+
+def stock_rates(users_stocks: List[str] = ["AAPL", "AMZN", "GOOGL", "NVDA", "META"]) -> List[Dict[str, Any]]:
+    """Функция принимает список акций. Возвращает котировки, полученные через API."""
+    logger.info("Функция начала свою работу.")
+    try:
+        result_stocks_list = []
+        load_dotenv()
+        api_key = os.getenv("API_ALPHA")
+        logger.info("Функция получает данные по котировкам.")
+        for stock in users_stocks:
+            url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={api_key}"
+            response = requests.get(url, timeout=5, allow_redirects=False)
+            result = response.json()
+            logger.info(f"{result}")
+            result_stocks_list.append({"stock": stock, "price": round(float(result["Global Quote"]["05. price"]), 2)})
+        logger.info("Функция успешно завершила свою работу.")
+        return result_stocks_list
+    except Exception:
+        logger.error("При работе функции произошла ошибка!")
+        raise Exception("При работе функции произошла ошибка!")
 
 
 if __name__ == "__main__":
-    data = reader_json("../data/operations.json")
-    print(data)
+    res = stock_rates()
+    print(res)

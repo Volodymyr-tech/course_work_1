@@ -13,6 +13,7 @@ openpyxl = "^3.1.5"
 pytest = "^8.3.3"
 python-dotenv = "^1.0.1"
 yfinance = "^0.2.43"
+yahoo-fin = "^0.8.9.1"
 
 
 [tool.poetry.group.dev.dependencies]

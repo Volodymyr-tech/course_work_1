@@ -1,22 +1,23 @@
+import json
 import pandas as pd
 import os
 import datetime
-from src.xlsx_reader import pandas_reader_xlsx
 import requests
 from dotenv import load_dotenv
-from src.utils import get_date_range
+from src.utils import stock_rates
 import logging
-from config import VIEWS_LOGS,DATA_DIR
+from config import VIEWS_LOGS, DATA_DIR
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler(VIEWS_LOGS, mode="w", encoding='utf-8')
+file_handler = logging.FileHandler(VIEWS_LOGS, mode="w", encoding="utf-8")
 file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
+
 
 def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: datetime.date):
 
@@ -28,7 +29,7 @@ def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: da
     income_filtered = filtered_df[filtered_df["Сумма операции"] > 0]
 
     logger.info("Считаю сумму расходов")
-    total_expenses = filtered_df["Сумма операции"].sum()
+    total_expenses = filtered_df[filtered_df["Сумма операции"] < 0]["Сумма операции"].sum()
     income_total = income_filtered["Сумма операции"].sum()
 
     logger.info("Группировка по категориям и вычисление общей суммы по каждой категории")
@@ -71,6 +72,7 @@ def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: da
     if status_code == 200:
         exchange_rate = response.json()
 
+    get_sp_500_rate = stock_rates()
 
     logger.info("Финальный результат")
     result = {
@@ -84,21 +86,14 @@ def calculate_expenses(df: pd.DataFrame, start_date: datetime.date, end_date: da
                 {"currency": "EUR", "rate": exchange_rate["rates"]["EUR"]},
                 {"currency": "GBP", "rate": exchange_rate["rates"]["GBP"]},
             ],
-        }
+        },
+        "stock_prices": [
+            {"stock": get_sp_500_rate[0]["stock"], "price": get_sp_500_rate[0]["price"]},
+            {"stock": get_sp_500_rate[1]["stock"], "price": get_sp_500_rate[1]["price"]},
+            {"stock": get_sp_500_rate[2]["stock"], "price": get_sp_500_rate[2]["price"]},
+            {"stock": get_sp_500_rate[3]["stock"], "price": get_sp_500_rate[3]["price"]},
+            {"stock": get_sp_500_rate[4]["stock"], "price": get_sp_500_rate[4]["price"]},
+        ],
     }
 
-    return result
-
-
-if __name__ == "__main__":
-    path = os.path.join(DATA_DIR,"operations.xlsx")
-
-    # Загрузка данных через Pandas
-    data_fraime = pandas_reader_xlsx(path)
-
-    # Получаем дату начала и конца для фильтрации
-    start_date, end_date = get_date_range("05.11.2021", "M")
-
-    # Вычисляем расходы
-    res = calculate_expenses(data_fraime, start_date, end_date)
-    print(res)
+    return json.dumps(result, ensure_ascii=False)
