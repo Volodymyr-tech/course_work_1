@@ -1,8 +1,7 @@
 import json
 import logging
-from src.xlsx_reader import pandas_reader_xlsx
 import re
-import logging
+
 from config import SERVICES_LOGS
 
 logger = logging.getLogger(__file__)

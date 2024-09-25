@@ -1,8 +1,9 @@
-import pytest
-from src.xlsx_reader import pandas_reader_xlsx
 import os
-from config import DATA_DIR
+
 import pandas as pd
+
+from config import DATA_DIR
+from src.xlsx_reader import pandas_reader_xlsx
 
 
 def test_pandas_reader_xlsx_valid_path():

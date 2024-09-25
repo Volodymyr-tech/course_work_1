@@ -1,7 +1,8 @@
-import pytest
-from src.report import spending_by_workday
-import pandas as pd
 import json
+
+import pandas as pd
+
+from src.report import spending_by_workday
 
 
 def test_spending_by_workday():

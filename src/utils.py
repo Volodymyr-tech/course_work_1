@@ -1,10 +1,12 @@
-from config import UTILS_LOGS
-import os
 import datetime
 import logging
-from dotenv import load_dotenv
+import os
+from typing import Any, Dict, List
+
 import requests
-from typing import Any, Dict, List, Tuple
+from dotenv import load_dotenv
+
+from config import UTILS_LOGS
 
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.DEBUG)

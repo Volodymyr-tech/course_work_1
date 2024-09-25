@@ -1,6 +1,6 @@
-import pytest
 import datetime
-from src.utils import start_of_week, start_of_month, start_of_year, get_date_range
+
+from src.utils import get_date_range, start_of_month, start_of_week, start_of_year
 
 
 def test_start_of_week():

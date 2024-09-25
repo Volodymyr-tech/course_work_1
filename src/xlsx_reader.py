@@ -1,5 +1,6 @@
+from typing import Any, Dict, List, Union
+
 import pandas as pd
-from typing import List, Dict, Any, Union
 
 
 def pandas_reader_xlsx(path: str) -> Union[Dict[str, Any], List[Any]]:

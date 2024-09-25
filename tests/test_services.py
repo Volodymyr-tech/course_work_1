@@ -1,6 +1,6 @@
-import pytest
-from src.services import df_to_dict, transfers_and_cash_grouped
 import pandas as pd
+
+from src.services import df_to_dict, transfers_and_cash_grouped
 
 
 def test_df_to_dict():

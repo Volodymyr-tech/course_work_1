@@ -1,12 +1,14 @@
-import json
-import pandas as pd
-import os
 import datetime
+import json
+import logging
+import os
+
+import pandas as pd
 import requests
 from dotenv import load_dotenv
+
+from config import VIEWS_LOGS
 from src.utils import stock_rates
-import logging
-from config import VIEWS_LOGS, DATA_DIR
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
